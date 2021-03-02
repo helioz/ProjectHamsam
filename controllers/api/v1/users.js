@@ -1,13 +1,12 @@
 const Joi = require('joi');
+const standardError = require('../../../lib/standardError');
 const StandardError = require('../../../lib/standardError');
 const logger = require('../../../lib/standardLogging')
+const usersModel = require('../../../models/users')
 
 
 module.exports = {
-    post: (req, res) => {
-        // Create a new user:
-
-        console.log(req.body);
+    post: async (req, res) => {
         const schema = Joi.object().keys({
             username: Joi.string().trim().min(1).required(),
             displayName: Joi.string().trim().min(1).required(),
@@ -21,8 +20,19 @@ module.exports = {
                 'UNEXPECTED_FORMAT', 'Expected userName and displayName', { allowed: true }, ''));
             return;
         }
-        res.send(req.body)
-
+        try {
+            const resp = await usersModel.insert({
+                username: req.body.username,
+                displayName: req.body.displayName
+            });
+            console.log(resp);
+            res.status(200).send(resp);
+            return;
+        } catch (error) {
+            logger.error('post', 'usersController', 'Unable to inset user', error);
+            res.status(500).send(standardError(500, 'USER_CREATION_FAILED', 'Unable to create user', { allowed: true }));
+            return;
+        }
     },
 
 }
