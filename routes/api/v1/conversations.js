@@ -6,7 +6,10 @@ const securityMiddleware = require('../../../middlewares/security')
 
 router.use(securityMiddleware);
 
-router.get('/:convId', conversationsController.get);
+router.post('/', conversationsController.insert);
+
+
+router.get('/:convId', conversationsController.getOne);
 router.delete('/:convId', conversationsController.get);
 router.put('/:convId', conversationsController.get);
 
