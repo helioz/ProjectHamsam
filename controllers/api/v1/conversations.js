@@ -39,30 +39,57 @@ module.exports = {
     insert: async (req, res) => {
         const schema = Joi.object().keys({
             title: Joi.string().trim().min(1).required(),
+            members: Joi.array().required().items(Joi.string().trim()),
+            // admins: Joi.array().required().items(Joi.string().trim()),
             description: Joi.string().trim(),
             type: Joi.string().trim().required().lowercase()
         })
         try {
             Joi.assert(req.body, schema)
+            if (req.body.members.indexOf(req.userid) === -1) {
+                req.body.members.push(req.userid)
+            }
         } catch (err) {
             logger.error('insert', 'conversationsController', 'Badly formatted data', err)
             res.status(400).send(StandardError(400,
                 'UNEXPECTED_FORMAT', 'Expected title, and type. description optional', { allowed: true }));
             return;
         }
+        let resp;
         try {
-            const resp = await conversationsModel.insert({
+            resp = await conversationsModel.insert({
                 title: req.body.title,
                 description: req.body.description || '',
                 type: req.body.type
-            });
-            res.status(200).send(resp);
-            return;
+            })
         } catch (error) {
             logger.error('post', 'usersController', 'Unable to create conversation', error);
             res.status(500).send(standardError(500, 'CONVERSATION_CREATION_FAILED', 'Unable to create conversation', { allowed: true }));
             return;
         }
+        try {
+
+        } catch (error) {
+            logger.error('post', 'usersController', 'Unable to add admin', error);
+            // Delete conversation here
+            res.status(500).send(standardError(500, 'CONVERSATION_CREATION_FAILED', 'Unable to create conversation', { allowed: true }));
+        }
+        const addMembersResults = [];
+        for (let i = 0; i < req.body.members.length; i++) {
+            addMembersResults.push(conversationMembers.insert({ userId: req.body.members[i], convId: resp._id }))
+        }
+        try {
+            const members = await Promise.all(addMembersResults);
+        } catch (err) {
+            logger.error('post', 'usersController', 'Unable to add all members', error);
+            res.status(500).send(standardError(500, 'CONVERSATION_MEMBERS_FAILED', 'Unable to create conversation', { allowed: false }));
+        }
+        // Create a db Entry {convId: "", userId: ""} for conversation members and conversation admins
+        resp.members = req.body.members
+        resp.admins = [req.userid]
+        res.status(200).send(resp);
+        return;
+
     },
 }
 
