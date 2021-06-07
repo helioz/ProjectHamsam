@@ -1,9 +1,23 @@
 const express = require('express');
 const morgan = require('morgan');
+const mongoose = require('mongoose');
 const swaggerUI = require('swagger-ui-express');
 const swaggerJSDoc = require('swagger-jsdoc');
 
 // const path = require('path');
+const url = 'mongodb://127.0.0.1:27017/project-aloha';
+
+// Connect to mongoDB
+mongoose.connect(url, { useNewUrlParser: true });
+
+const db = mongoose.connection;
+db.once('open', _ => {
+  console.log('Database connected:', url)
+})
+
+db.on('error', err => {
+  console.error('connection error:', err)
+})
 
 // Extended https://swagger.io/specification/
 const swaggerOptions = {
@@ -34,7 +48,6 @@ const apiV1ConversationsRouter = require('./routes/api/v1/conversations');
 const apiV1UsersRouter = require('./routes/api/v1/users');
 
 // const securityMiddleware = require('./middlewares/security')
-
 
 const app = express();
 
