@@ -14,8 +14,10 @@
   "author": "soorej",
   "license": "ISC",
   "dependencies": {
+    "connect-mongo": "^4.4.1",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "express-session": "^1.17.2",
     "joi": "^17.4.0",
     "mongodb": "^3.6.4",
     "mongoose": "^5.12.13",

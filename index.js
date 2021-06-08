@@ -1,24 +1,14 @@
 const express = require('express');
 const morgan = require('morgan');
-const mongoose = require('mongoose');
+const session = require('express-session');
 const swaggerUI = require('swagger-ui-express');
 const swaggerJSDoc = require('swagger-jsdoc');
 const Env = require('./config/environment');
+const MongoStore = require('connect-mongo');
 
-// const path = require('path');
-const url = 'mongodb://127.0.0.1:27017/project-aloha';
-
-// Connect to mongoDB
-mongoose.connect(url, { useNewUrlParser: true });
-
-const db = mongoose.connection;
-db.once('open', _ => {
-  console.log('Database connected:', url)
-})
-
-db.on('error', err => {
-  console.error('connection error:', err)
-})
+// Db setup
+// TODO: export connection object to be used?
+require('./database');
 
 // Extended https://swagger.io/specification/
 const swaggerOptions = {
@@ -41,24 +31,34 @@ const swaggerOptions = {
         version: '0.0.1'
     },
     apis: ['app.js', './routes/api/v1/*.js'],
-}
-const swaggerDocs = swaggerJSDoc(swaggerOptions)
-
-
-const apiV1ConversationsRouter = require('./routes/api/v1/conversations');
-const apiV1UsersRouter = require('./routes/api/v1/users');
-
+};
+const swaggerDocs = swaggerJSDoc(swaggerOptions);
 
 const app = express();
 
 app.use(express.json());
-app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs))
+app.use(express.urlencoded({extended: true}));
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 app.use(morgan('dev'));
 
+// Session management
+const sessionStore = MongoStore.create({
+    mongoUrl: Env.MONGO_URL,
+    collectionName: 'sessions'
+});
 
+app.use(session({
+    secret: 'pssssttt',
+    resave: false,
+    saveUninitialized: true,
+    store: sessionStore,
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 24 //1 day
+    }
+}));
 
-app.use('/api/v1/conversations', apiV1ConversationsRouter);
-app.use('/api/v1/users', apiV1UsersRouter)
-
+app.get('/', (req, res, next) => {
+    res.send('<h1> Hello World </h1>');
+});
 
 app.listen(Env.Port || '3000');
