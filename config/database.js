@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Env = require('./config/environment');
+const Env = require('./environment');
 
 // Connect to mongoDB
 mongoose.connect(Env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -13,3 +13,5 @@ db.once('open', _ => {
 db.on('error', err => {
   console.error('connection error:', err);
 });
+
+module.exports = db;
