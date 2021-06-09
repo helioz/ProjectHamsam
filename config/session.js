@@ -1,5 +1,6 @@
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
+const Env = require('./environment');
 
 const sessionStore = MongoStore.create({
     mongoUrl: Env.MONGO_URL,
