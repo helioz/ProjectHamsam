@@ -35,10 +35,12 @@ ssh into the ec2 instance
 
 delete existing docker container
 
-`docker ps
+```
+docker ps
 docker docker stop <container ID>
 docker rm <container ID>
-docker run -p 3000:3000 -d docker.io/soorejjones/aloha1:<commit-id>`
+docker run -p 3000:3000 -d docker.io/soorejjones/aloha1:<commit-id>
+````
 
 Access your deployment at : 54.174.190.38:3000
 
