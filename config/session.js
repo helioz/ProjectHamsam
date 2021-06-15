@@ -2,7 +2,7 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const Env = require('./environment');
 
-const sessionStore = MongoStore.create({
+const sessionStore = MongoStore.create({  // Have a wrapper around db calls, always
     mongoUrl: Env.MONGO_URL,
     collectionName: 'sessions'
 });
