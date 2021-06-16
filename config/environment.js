@@ -2,5 +2,8 @@
 require('dotenv').config();
 module.exports = {
     Port: process.env.PORT,
-    MONGO_URL: process.env.MONGO_URL
+    MongoHost: process.env.MONGO_HOST,
+    MongoUser: process.env.MONGO_USER,
+    MongoPassword:process.env.MONGO_PWD,
+    MongoDB: process.env.MONGO_DB
 };
