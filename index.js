@@ -1,28 +1,24 @@
 const express = require('express');
 const morgan = require('morgan');
+
 const Env = require('./config/environment');
 const Mongo = require('./lib/mongoDB');
 const Logger = require('./lib/standardLogging')
 const StandardError = require('./lib/standardError');
 
+const UsersRoutesV1 = require('./routes/api/v1/users');
 
-// const session = require('./config/session.js');
-
-// Db setup
-// const connection = require('./config/database');
 
 const app = express();
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
-// Session management
-// app.use(session);
 
 app.get('/', (req, res, next) => {
     res.send('<h1> Hello World </h1>');
 });
-
 app.get('/healthcheck', async (req, res, next) => {
     try {
         const dbConn = await Mongo.getDbClient();
