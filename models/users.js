@@ -1,5 +1,6 @@
 
 const Mongo = require('../lib/mongoDB');
+const ObjectID = require('mongodb').ObjectID
 const logger = require('../lib/standardLogging')
 
 
@@ -38,6 +39,30 @@ const usersModel = {
                 });
         })
     },
+    getOne: async (userId) => {
+        let dbConn;
+        let resp;
+        let _id
+        try {
+            _id = new ObjectID(userId)
+        } catch (error) {
+            logger.error('getOne', 'usersModel', "User Id not valid", '');
+            return null;
+        }
+        try {
+            dbConn = await Mongo.getDbClient();
+        } catch (error) {
+            logger.error('getOne', 'usersModel', 'connection error', error);
+            throw "usersModel:insert => ERROR connection error";
+        }
+        try {
+            resp = await dbConn.collection('users').findOne({ _id }, {})
+        } catch (error) {
+            logger.error('getOne', 'usersModel', "Could not find user", error);
+            throw error
+        }
+        return resp
+    }
 
 }
 module.exports = usersModel;
