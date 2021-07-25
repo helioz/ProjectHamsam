@@ -6,8 +6,7 @@ const Mongo = require('./lib/mongoDB');
 const Logger = require('./lib/standardLogging')
 const StandardError = require('./lib/standardError');
 
-const UsersRoutesV1 = require('./routes/api/v1/users');
-
+const v1Routes = require('./routes/api/v1/routes')
 
 const app = express();
 
@@ -15,7 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
-
+app.use('/api/v1/', v1Routes);
 app.get('/', (req, res, next) => {
     res.send('<h1> Hello World </h1>');
 });
@@ -33,4 +32,6 @@ app.get('/healthcheck', async (req, res, next) => {
     }
 })
 
+
 app.listen(Env.Port || '3000');
+console.log('Listening on http://localhost:' + Env.Port || '3000')
